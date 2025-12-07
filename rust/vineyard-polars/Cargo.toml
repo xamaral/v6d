@@ -21,7 +21,7 @@ path = "src/lib.rs"
 [dependencies]
 arrow-array = { workspace = true }
 arrow-schema = { workspace = true }
-arrow2 = { workspace = true }
+arrow-data = { workspace = true }
 itertools = { workspace = true }
 polars-arrow = { workspace = true }
 polars-core = { workspace = true }

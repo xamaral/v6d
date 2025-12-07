@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "vineyard",
-    "vineyard-datafusion",
     "vineyard-polars",
     "vineyard-integration-testing",
 ]
@@ -22,13 +21,12 @@ edition = "2021"
 readme = "README.md"
 
 [workspace.dependencies]
-arrow-array = ">=40, <45"
-arrow-buffer = ">=40, <45"
-arrow-ipc = ">=40, <45"
-arrow-schema = ">=40, <45"
-arrow2 = { version = ">=0.17, <0.18", features = ["arrow"] }
+arrow-array = { version = "53.4.1", features = ["ffi"] }
+arrow-buffer = "53.4.1"
+arrow-ipc = "53.4.1"
+arrow-schema = { version = "53.4.1", features = ["ffi"] }
+arrow-data = { version = "53.4.1", features = ["ffi"] }
 ctor = "0.2"
-datafusion = ">= 28"
 downcast-rs = "1.2"
 env_logger = "0.9"
 futures = "0.3"
@@ -41,8 +39,8 @@ memmap2 = "0.7"
 num-traits = ">= 0.2"
 num-derive = ">= 0.4"
 parking_lot = "0.12"
-polars-arrow = ">=0.32, <34"
-polars-core = ">=0.32, <34"
+polars-arrow = "0.52"
+polars-core = "0.52"
 rand = "0.8"
 sendfd = "0.4"
 serde = "1.0"
@@ -50,8 +48,15 @@ serde_derive = "1.0"
 serde_json = "1.0"
 spectral = "0.6"
 static_str_ops = "0.1.2"
-
 vineyard = { version = "0.18.1", path = "./vineyard" }
-vineyard-datafusion = { version = "0.18.1", path = "./vineyard-datafusion" }
 vineyard-polars = { version = "0.18.1", path = "./vineyard-polars" }
 vineyard-integration-testing = { version = "0.18.1", path = "./vineyard-integration-testing" }
+
+[patch.crates-io]
+arrow = { path = "/home/paul/repos/arrow-rs/arrow" }
+arrow-array = { path = "/home/paul/repos/arrow-rs/arrow-array" }
+arrow-buffer = { path = "/home/paul/repos/arrow-rs/arrow-buffer" }
+arrow-data = { path = "/home/paul/repos/arrow-rs/arrow-data" }
+arrow-ipc = { path = "/home/paul/repos/arrow-rs/arrow-ipc" }
+arrow-schema = { path = "/home/paul/repos/arrow-rs/arrow-schema" }
+arrow-cast = { path = "/home/paul/repos/arrow-rs/arrow-cast" }

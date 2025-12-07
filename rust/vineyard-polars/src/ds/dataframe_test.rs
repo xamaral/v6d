@@ -42,17 +42,42 @@ mod tests {
         assert_that!(dataframe.width()).is_equal_to(3);
         let mut names = Vec::with_capacity(dataframe.width());
         for column in dataframe.get_columns() {
-            names.push(column.name());
+            names.push(column.name().to_string());
         }
-        assert_that!(names).is_equal_to(vec!["f0", "f1", "f2"]);
+        assert_that!(names).is_equal_to(vec![
+            "f0".to_string(),
+            "f1".to_string(),
+            "f2".to_string()
+        ]);
 
         // check column values
-        assert_that!(dataframe.column("f0").unwrap().head(Some(4)))
-            .is_equal_to(&Series::new("f0", [1, 2, 3, 4]));
-        assert_that!(dataframe.column("f1").unwrap().head(Some(4)))
-            .is_equal_to(&Series::new("f1", ["foo", "bar", "baz", "qux"]));
-        assert_that!(dataframe.column("f2").unwrap().head(Some(4)))
-            .is_equal_to(&Series::new("f2", [3.0, 5.0, 7.0, 9.0]));
+        assert_that!(
+            dataframe
+                .column("f0")
+                .unwrap()
+                .as_materialized_series()
+                .head(Some(4))
+        )
+        .is_equal_to(&Series::new("f0".into(), [1, 2, 3, 4]));
+        assert_that!(
+            dataframe
+                .column("f1")
+                .unwrap()
+                .as_materialized_series()
+                .head(Some(4))
+        )
+        .is_equal_to(&Series::new(
+            "f1".into(),
+            ["foo", "bar", "baz", "qux"]
+        ));
+        assert_that!(
+            dataframe
+                .column("f2")
+                .unwrap()
+                .as_materialized_series()
+                .head(Some(4))
+        )
+        .is_equal_to(&Series::new("f2".into(), [3.0, 5.0, 7.0, 9.0]));
         return Ok(());
     }
 }
