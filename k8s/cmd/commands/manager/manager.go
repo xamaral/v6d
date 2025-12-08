@@ -70,10 +70,8 @@ var managerCmd = &cobra.Command{
 		util.AssertNoArgs(cmd, args)
 
 		ctrl.SetLogger(log.Log.Logger)
-		schedulerStartable, err := checkKubernetesVersionForScheduler()
-		if err != nil {
-			log.Errorf(err, "failed to check kubernetes version for scheduler")
-		}
+		// Allow the scheduler on all supported Kubernetes versions.
+		schedulerStartable := true
 		// start the controller
 		mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 			Scheme:                 util.Scheme(),
@@ -296,34 +294,8 @@ func startScheduler(mgr manager.Manager, schedulerConfigFile string) {
 	}
 }
 
-// checkKubernetesVersionForScheduler checks the kubernetes version for the scheduler
-// the scheduler only supports kubernetes version 1.19-1.24
+// checkKubernetesVersionForScheduler previously enforced a narrow version window.
+// We now accept all versions; keep the signature for compatibility.
 func checkKubernetesVersionForScheduler() (bool, error) {
-	config := util.GetKubernetesConfig()
-
-	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
-	if err != nil {
-		return false, err
-	}
-
-	information, err := discoveryClient.ServerVersion()
-	if err != nil {
-		return false, err
-	}
-
-	major, err := strconv.Atoi(information.Major)
-	if err != nil {
-		return false, err
-	}
-
-	minor, err := strconv.Atoi(information.Minor)
-	if err != nil {
-		return false, err
-	}
-
-	if major != 1 || minor < 19 || minor > 24 {
-		return false, fmt.Errorf("the scheduler only supports kubernetes version 1.19-1.24")
-	}
-
 	return true, nil
 }
