@@ -64,13 +64,23 @@ pub fn downcast_array_rc<T: Array>(object: Rc<dyn Array>) -> Result<Rc<T>> {
         .map_err(|_| VineyardError::invalid(format!("downcast object to array failed",)));
 }
 
-pub trait NumericType = ToArrowType where <Self as ToArrowType>::Type: array::ArrowPrimitiveType;
+pub trait NumericType: ToArrowType {
+    type Primitive: array::ArrowPrimitiveType;
+}
+
+impl<T> NumericType for T
+where
+    T: ToArrowType,
+    <T as ToArrowType>::Type: array::ArrowPrimitiveType,
+{
+    type Primitive = <T as ToArrowType>::Type;
+}
 
 pub type TypedBuffer<T> =
-    ScalarBuffer<<<T as ToArrowType>::Type as array::ArrowPrimitiveType>::Native>;
+    ScalarBuffer<<<T as NumericType>::Primitive as array::ArrowPrimitiveType>::Native>;
 
-pub type TypedArray<T> = array::PrimitiveArray<<T as ToArrowType>::Type>;
-pub type TypedBuilder<T> = builder::PrimitiveBuilder<<T as ToArrowType>::Type>;
+pub type TypedArray<T> = array::PrimitiveArray<<T as NumericType>::Primitive>;
+pub type TypedBuilder<T> = builder::PrimitiveBuilder<<T as NumericType>::Primitive>;
 
 #[derive(Debug)]
 pub struct NumericArray<T: NumericType> {

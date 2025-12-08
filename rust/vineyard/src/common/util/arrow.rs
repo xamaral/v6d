@@ -27,7 +27,6 @@ use arrow_buffer::{alloc, Buffer, MutableBuffer};
 ///
 /// Instead, we cast pointers (`*const u8` and `*mut u8`) to the expected type.
 pub struct MmapAllocation {}
-impl alloc::Allocation for MmapAllocation {}
 
 lazy_static! {
     static ref MMAP_ALLOCATION: Arc<MmapAllocation> = Arc::new(MmapAllocation {});
