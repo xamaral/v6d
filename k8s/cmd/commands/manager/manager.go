@@ -19,14 +19,12 @@ package manager
 
 import (
 	"fmt"
-	"strconv"
 	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/cmd/kube-scheduler/app"
 
