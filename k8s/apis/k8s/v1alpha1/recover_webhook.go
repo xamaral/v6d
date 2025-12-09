@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/v6d-io/v6d/k8s/pkg/log"
 )
@@ -49,22 +50,22 @@ func (r *Recover) Default() {
 var _ webhook.Validator = &Recover{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Recover) ValidateCreate() error {
+func (r *Recover) ValidateCreate() (admission.Warnings, error) {
 	recoverlog.Info("validate create", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Recover) ValidateUpdate(old runtime.Object) error {
+func (r *Recover) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	recoverlog.Info("validate update", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Recover) ValidateDelete() error {
+func (r *Recover) ValidateDelete() (admission.Warnings, error) {
 	recoverlog.Info("validate delete", "name", r.Name)
 
-	return nil
+	return nil, nil
 }

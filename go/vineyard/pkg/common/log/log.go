@@ -1,11 +1,9 @@
-/** Copyright 2020-2023 Alibaba Group Holding Limited.
-
+/*
+Copyright 2020-2023 Alibaba Group Holding Limited.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,16 +31,8 @@ import (
 var (
 	defaultLogger = makeDefaultLogger(0)
 	dlog          = NewDelegatingLogSink(defaultLogger)
-	Log           = Logger{newLogrLogger(dlog).WithName("vineyard")}
+	Log           = Logger{logr.New(dlog).WithName("vineyard")}
 )
-
-// New returns a new Logger instance.  This is primarily used by libraries
-// implementing LogSink, rather than end users.
-func newLogrLogger(sink logr.Logger) Logger {
-	logger := Logger{}
-	logger.Logger = sink
-	return logger
-}
 
 func SetLogLevel(level int) {
 	defaultLogger = makeDefaultLogger(level)
@@ -92,14 +82,15 @@ type Logger struct {
 
 // SetLogger sets a concrete logging implementation for all deferred Loggers.
 func SetLogger(l Logger) {
-	dlog.Fulfill(l)
+	dlog.Fulfill(l.Logger)
 }
 
 // FromContext returns a logger with predefined values from a context.Context.
 func FromContext(ctx context.Context, keysAndValues ...any) Logger {
 	log := Log.Logger
 	if ctx != nil {
-		log = logr.FromContext(ctx)
+		logger, _ := logr.FromContext(ctx) // compiler says 2 values
+		log = logger
 	}
 
 	return Logger{log.WithValues(keysAndValues...)}

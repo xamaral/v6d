@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.8.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.16.4
   name: recovers.k8s.v6d.io
 spec:
   group: k8s.v6d.io
@@ -38,6 +37,9 @@ spec:
                 type: string
               backupNamespace:
                 type: string
+            required:
+            - backupName
+            - backupNamespace
             type: object
           status:
             properties:
@@ -47,15 +49,11 @@ spec:
                 type: object
               state:
                 type: string
+            required:
+            - objectMapping
             type: object
         type: object
     served: true
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

@@ -16,8 +16,6 @@ limitations under the License.
 package client
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/v6d-io/v6d/go/vineyard/pkg/common/types"
 	"github.com/v6d-io/v6d/k8s/cmd/commands/flags"
@@ -61,7 +59,7 @@ var putCmd = &cobra.Command{
 		value := []byte(flags.Value)
 		object_id, err := client.PutBlob(value, uint64(len(flags.Value)))
 		if err != nil {
-			log.Errorf(err, fmt.Sprintf("failed to put value: %v", value))
+			log.Errorf(err, "failed to put value: %v", value)
 		}
 		log.Output(types.ObjectIDToString(object_id))
 	},

@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.8.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.16.4
   name: csidrivers.k8s.v6d.io
 spec:
   group: k8s.v6d.io
@@ -28,6 +27,7 @@ spec:
           spec:
             properties:
               clusters:
+                default: []
                 items:
                   properties:
                     name:
@@ -36,6 +36,9 @@ spec:
                     namespace:
                       default: ""
                       type: string
+                  required:
+                  - name
+                  - namespace
                   type: object
                 type: array
               enableToleration:
@@ -77,6 +80,13 @@ spec:
                   provisionerImage:
                     default: registry.k8s.io/sig-storage/csi-provisioner:v3.3.0
                     type: string
+                required:
+                - attacherImage
+                - enableTopology
+                - imagePullPolicy
+                - livenessProbeImage
+                - nodeRegistrarImage
+                - provisionerImage
                 type: object
               storageClassName:
                 default: vineyard-csi
@@ -84,6 +94,15 @@ spec:
               volumeBindingMode:
                 default: WaitForFirstConsumer
                 type: string
+            required:
+            - clusters
+            - enableToleration
+            - enableVerboseLog
+            - image
+            - imagePullPolicy
+            - sidecar
+            - storageClassName
+            - volumeBindingMode
             type: object
           status:
             properties:
@@ -95,9 +114,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

@@ -2,7 +2,6 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: manager-role
 rules:
 - apiGroups:
@@ -35,23 +34,6 @@ rules:
   - ""
   resources:
   - persistentvolumeclaims
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims/finalizers
-  verbs:
-  - patch
-- apiGroups:
-  - ""
-  resources:
   - persistentvolumes
   verbs:
   - create
@@ -64,6 +46,7 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - persistentvolumeclaims/finalizers
   - persistentvolumes/finalizers
   verbs:
   - patch
@@ -71,6 +54,7 @@ rules:
   - ""
   resources:
   - pods
+  - pods/status
   verbs:
   - create
   - delete
@@ -86,26 +70,7 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - pods/status
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - update
-- apiGroups:
-  - ""
-  resources:
   - serviceaccounts
-  - services
-  verbs:
-  - create
-  - delete
-  - get
-  - update
-- apiGroups:
-  - ""
-  resources:
   - services
   verbs:
   - create
@@ -116,15 +81,6 @@ rules:
   - apps
   resources:
   - daemonsets
-  verbs:
-  - create
-  - get
-  - list
-  - update
-  - watch
-- apiGroups:
-  - apps
-  resources:
   - deployments
   verbs:
   - create
@@ -171,163 +127,12 @@ rules:
   - k8s.v6d.io
   resources:
   - backups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - backups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - csidrivers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - csidrivers/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - csidrivers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - globalobjects
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - globalobjects/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - localobjects
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - localobjects/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - operations
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - operations/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - operations/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - recovers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - recovers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - sidecars
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - sidecars/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
-  - sidecars/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
   - vineyardds
   verbs:
   - create
@@ -340,16 +145,26 @@ rules:
 - apiGroups:
   - k8s.v6d.io
   resources:
-  - vineyardds/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - k8s.v6d.io
-  resources:
+  - backups/status
+  - csidrivers/status
+  - globalobjects/status
+  - localobjects/status
+  - operations/status
+  - recovers/status
+  - sidecars/status
   - vineyardds/status
   verbs:
   - get
   - patch
+  - update
+- apiGroups:
+  - k8s.v6d.io
+  resources:
+  - csidrivers/finalizers
+  - operations/finalizers
+  - sidecars/finalizers
+  - vineyardds/finalizers
+  verbs:
   - update
 - apiGroups:
   - snapshot.storage.k8s.io
@@ -403,15 +218,6 @@ rules:
   - storage.k8s.io
   resources:
   - volumeattachments
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - storage.k8s.io
-  resources:
   - volumeattachments/status
   verbs:
   - get

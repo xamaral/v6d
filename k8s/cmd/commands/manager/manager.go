@@ -18,23 +18,24 @@ limitations under the License.
 package manager
 
 import (
+	"context"
 	"fmt"
-	"strconv"
 	"sync"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/kubernetes/cmd/kube-scheduler/app"
 
-	framework "k8s.io/kubernetes/pkg/scheduler/framework/v1alpha1"
+	framework "k8s.io/kubernetes/pkg/scheduler/framework"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/v6d-io/v6d/k8s/apis/k8s/v1alpha1"
 	"github.com/v6d-io/v6d/k8s/cmd/commands/flags"
@@ -70,16 +71,18 @@ var managerCmd = &cobra.Command{
 		util.AssertNoArgs(cmd, args)
 
 		ctrl.SetLogger(log.Log.Logger)
-		schedulerStartable, err := checkKubernetesVersionForScheduler()
-		if err != nil {
-			log.Errorf(err, "failed to check kubernetes version for scheduler")
-		}
+		// Allow the scheduler on all supported Kubernetes versions.
+		schedulerStartable := true
 		// start the controller
 		mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-			Scheme:                 util.Scheme(),
-			MetricsBindAddress:     flags.MetricsAddr,
-			CertDir:                flags.WebhookCertDir,
-			Port:                   9443,
+			Scheme: util.Scheme(),
+			Metrics: metricsserver.Options{
+				BindAddress: flags.MetricsAddr,
+			},
+			WebhookServer: webhook.NewServer(webhook.Options{
+				Port:    9443,
+				CertDir: flags.WebhookCertDir,
+			}),
 			HealthProbeBindAddress: flags.ProbeAddr,
 			LeaderElection:         flags.EnableLeaderElection,
 			LeaderElectionID:       "5fa514f1.v6d.io",
@@ -208,29 +211,42 @@ func startManager(
 			log.Fatal(err, "unable to create csidriver webhook")
 		}
 
+		// inject the decoder
+		decoder := admission.NewDecoder(mgr.GetScheme())
+
 		// register the assembly webhook
 		log.Info("registering the assembly webhook")
+		assemblyInjector := &operation.AssemblyInjector{Client: mgr.GetClient()}
+		if err := assemblyInjector.InjectDecoder(decoder); err != nil {
+			log.Fatal(err, "unable to inject decoder into assembly webhook")
+		}
 		mgr.GetWebhookServer().Register("/mutate-v1-pod",
 			&webhook.Admission{
-				Handler: &operation.AssemblyInjector{Client: mgr.GetClient()},
+				Handler: assemblyInjector,
 			})
 		log.Info("the assembly webhook is registered")
 
 		// register the sidecar webhook
 		log.Info("registering the sidecar webhook")
+		sidecarInjector := &sidecar.Injector{Client: mgr.GetClient()}
+		if err := sidecarInjector.InjectDecoder(decoder); err != nil {
+			log.Fatal(err, "unable to inject decoder into sidecar webhook")
+		}
 		mgr.GetWebhookServer().Register("/mutate-v1-pod-sidecar",
 			&webhook.Admission{
-				Handler: &sidecar.Injector{
-					Client: mgr.GetClient(),
-				},
+				Handler: sidecarInjector,
 			})
 		log.Info("the sidecar webhook is registered")
 
 		// register the scheduling webhook
 		log.Info("registering the scheduling webhook")
+		schedulingInjector := &scheduling.Injector{Client: mgr.GetClient()}
+		if err := schedulingInjector.InjectDecoder(decoder); err != nil {
+			log.Fatal(err, "unable to inject decoder into scheduling webhook")
+		}
 		mgr.GetWebhookServer().Register("/mutate-v1-pod-scheduling",
 			&webhook.Admission{
-				Handler: &scheduling.Injector{Client: mgr.GetClient()},
+				Handler: schedulingInjector,
 			})
 		log.Info("the scheduling webhook is registered")
 
@@ -277,7 +293,7 @@ func startScheduler(mgr manager.Manager, schedulerConfigFile string) {
 
 	command := app.NewSchedulerCommand(
 		app.WithPlugin(schedulers.Name,
-			func(obj runtime.Object, handle framework.FrameworkHandle) (framework.Plugin, error) {
+			func(ctx context.Context, obj runtime.Object, handle framework.Handle) (framework.Plugin, error) {
 				return schedulers.New(mgr.GetClient(), mgr.GetConfig(), obj, handle)
 			},
 		),
@@ -294,36 +310,4 @@ func startScheduler(mgr manager.Manager, schedulerConfigFile string) {
 	if err := command.Execute(); err != nil {
 		log.Fatal(err, "failed to execute scheduler")
 	}
-}
-
-// checkKubernetesVersionForScheduler checks the kubernetes version for the scheduler
-// the scheduler only supports kubernetes version 1.19-1.24
-func checkKubernetesVersionForScheduler() (bool, error) {
-	config := util.GetKubernetesConfig()
-
-	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
-	if err != nil {
-		return false, err
-	}
-
-	information, err := discoveryClient.ServerVersion()
-	if err != nil {
-		return false, err
-	}
-
-	major, err := strconv.Atoi(information.Major)
-	if err != nil {
-		return false, err
-	}
-
-	minor, err := strconv.Atoi(information.Minor)
-	if err != nil {
-		return false, err
-	}
-
-	if major != 1 || minor < 19 || minor > 24 {
-		return false, fmt.Errorf("the scheduler only supports kubernetes version 1.19-1.24")
-	}
-
-	return true, nil
 }

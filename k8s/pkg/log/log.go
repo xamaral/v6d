@@ -27,14 +27,15 @@ import (
 	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
 
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	vlog "github.com/v6d-io/v6d/go/vineyard/pkg/common/log"
 )
 
 var (
 	defaultLogger = makeDefaultLogger(0)
-	dlog          = log.NewDelegatingLogger(defaultLogger)
-	Log           = Logger{dlog.WithName("vineyard")}
+	dlog          = vlog.NewDelegatingLogSink(defaultLogger)
+	Log           = Logger{logr.New(dlog).WithName("vineyard")}
 )
 
 func SetLogLevel(level int) {
@@ -92,10 +93,8 @@ func SetLogger(l Logger) {
 func FromContext(ctx context.Context, keysAndValues ...any) Logger {
 	log := Log.Logger
 	if ctx != nil {
-		logWithCtx := logr.FromContext(ctx)
-		if logWithCtx != nil {
-			log = logWithCtx
-		}
+		logger, _ := logr.FromContext(ctx) // compiler says 2 values
+		log = logger
 	}
 	return Logger{log.WithValues(keysAndValues...)}
 }

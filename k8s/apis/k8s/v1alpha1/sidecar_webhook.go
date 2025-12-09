@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/v6d-io/v6d/k8s/pkg/log"
 )
@@ -49,22 +50,22 @@ func (r *Sidecar) Default() {
 var _ webhook.Validator = &Sidecar{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Sidecar) ValidateCreate() error {
+func (r *Sidecar) ValidateCreate() (admission.Warnings, error) {
 	sidecarlog.Info("validate create", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Sidecar) ValidateUpdate(old runtime.Object) error {
+func (r *Sidecar) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	sidecarlog.Info("validate update", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Sidecar) ValidateDelete() error {
+func (r *Sidecar) ValidateDelete() (admission.Warnings, error) {
 	sidecarlog.Info("validate delete", "name", r.Name)
 
-	return nil
+	return nil, nil
 }

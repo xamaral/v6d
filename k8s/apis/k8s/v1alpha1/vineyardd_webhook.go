@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/v6d-io/v6d/k8s/pkg/log"
 )
@@ -49,22 +50,22 @@ func (r *Vineyardd) Default() {
 var _ webhook.Validator = &Vineyardd{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Vineyardd) ValidateCreate() error {
+func (r *Vineyardd) ValidateCreate() (admission.Warnings, error) {
 	vlog.Info("validate create", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Vineyardd) ValidateUpdate(old runtime.Object) error {
+func (r *Vineyardd) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	vlog.Info("validate update", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Vineyardd) ValidateDelete() error {
+func (r *Vineyardd) ValidateDelete() (admission.Warnings, error) {
 	vlog.Info("validate delete", "name", r.Name)
 
-	return nil
+	return nil, nil
 }

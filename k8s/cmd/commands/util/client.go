@@ -172,7 +172,9 @@ func DeleteWithContext(
 }
 
 func Wait(condition wait.ConditionFunc) error {
-	return wait.PollImmediate(defaultWaitInternal, defaultWaitTimeout, condition)
+	return wait.PollUntilContextTimeout(context.Background(), defaultWaitInternal, defaultWaitTimeout, true, func(_ context.Context) (bool, error) {
+		return condition()
+	})
 }
 
 // CreateNamespaceIfNotExist creates namespace if it does not exist

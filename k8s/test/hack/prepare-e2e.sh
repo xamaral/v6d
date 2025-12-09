@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # Copyright 2020-2023 Alibaba Group Holding Limited.
 #
@@ -21,49 +22,49 @@ ARCH=$(go env GOHOSTARCH)
 
 # install kubectl
 if ! command -v kubectl &> /dev/null; then
-    @echo "installing kubectl..."
-    curl -LO https://dl.k8s.io/release/v1.24.0/bin/${OS}/${ARCH}/kubectl && chmod +x ./kubectl && mv ./kubectl ${INSTALL_DIR}
+    echo "installing kubectl..."
+    curl -LO https://dl.k8s.io/release/v1.24.0/bin/${OS}/${ARCH}/kubectl && chmod +x ./kubectl && sudo mv ./kubectl ${INSTALL_DIR}
     if [ $? -ne 0 ]; then
-        @echo "unable to install kubectl, please check"
+        echo "unable to install kubectl, please check"
     fi
 fi
 
 # install helm
 if ! command -v helm &> /dev/null; then
-    @echo "installing helm..."
-    wget https://get.helm.sh/helm-v3.9.3-${OS}-${ARCH}.tar.gz -O - |\ 
-    tar xz && mv ${OS}-${ARCH}/helm ${INSTALL_DIR}
+    echo "installing helm..."
+    wget https://get.helm.sh/helm-v3.9.3-${OS}-${ARCH}.tar.gz -O - |\
+    tar xz && sudo mv ${OS}-${ARCH}/helm ${INSTALL_DIR}
     if [ $? -ne 0 ]; then
-        @echo "unable to install helm, please check"
+        echo "unable to install helm, please check"
     fi
 fi
 
 # install yq
 if ! command -v yq &> /dev/null; then
-    @echo "installing yq..."
+    echo "installing yq..."
     wget https://github.com/mikefarah/yq/releases/download/v4.27.2/yq_${OS}_${ARCH}.tar.gz -O - |\
-    tar xz && mv yq_${OS}_${ARCH} ${INSTALL_DIR}/yq
+    tar xz && sudo mv yq_${OS}_${ARCH} ${INSTALL_DIR}/yq
     if [ $? -ne 0 ]; then
-        @echo "unable to install yq, please check."
+        echo "unable to install yq, please check."
     fi
 fi
 
 # install gomplate
 if ! command -v gomplate &> /dev/null; then
-    @echo "installing gomplate..."
+    echo "installing gomplate..."
     wget -q https://github.com/hairyhenderson/gomplate/releases/download/v3.11.3/gomplate_${OS}-${ARCH} &&  \
-    chmod +x ./gomplate_${OS}-${ARCH} && mv ./gomplate_${OS}-${ARCH} ${INSTALL_DIR}/gomplate
+    chmod +x ./gomplate_${OS}-${ARCH} && sudo mv ./gomplate_${OS}-${ARCH} ${INSTALL_DIR}/gomplate
     if [ $? -ne 0 ]; then
-        @echo "unable to install gomplate, please check."
+        echo "unable to install gomplate, please check."
     fi
 fi
 
-# install kind no more than v0.13.0
-if ! command -v kind &> /dev/null || [ $(kind version | awk '{print $2}' | cut -d'.' -f2) -gt 13 ]; then
-    @echo "installing kind..."
-    [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.13.0/kind-linux-amd64
+# install kind v0.22.0
+if ! command -v kind &> /dev/null || [ $(kind version | awk '{print $2}' | cut -d'.' -f2) -lt 22 ]; then
+    echo "installing kind..."
+    [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
     chmod +x ./kind && sudo mv ./kind ${INSTALL_DIR}/kind
     if [ $? -ne 0 ]; then
-        @echo "unable to install kind, please check."
+        echo "unable to install kind, please check."
     fi
 fi

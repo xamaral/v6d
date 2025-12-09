@@ -21,8 +21,8 @@ import (
 	"io/fs"
 	"log"
 
-	"sigs.k8s.io/kustomize/api/filesys"
 	"sigs.k8s.io/kustomize/api/krusty"
+	"sigs.k8s.io/kustomize/kyaml/filesys"
 
 	"github.com/v6d-io/v6d/k8s/config"
 )
@@ -66,9 +66,8 @@ func BuildKustomizeInEmbedDir() (Manifests, error) {
 	if err != nil {
 		log.Fatalf("failed to convert embedded file system to kustomize file system: %v", err)
 	}
-	k := krusty.MakeKustomizer(fSys, krusty.MakeDefaultOptions())
-
-	resMap, err := k.Run("default")
+	k := krusty.MakeKustomizer(krusty.MakeDefaultOptions())
+	resMap, err := k.Run(fSys, "default")
 	if err != nil {
 		log.Fatalf("failed to run kustomize build: %v", err)
 	}

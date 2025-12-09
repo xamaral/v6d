@@ -1,6 +1,6 @@
 module github.com/v6d-io/v6d/go/vineyard
 
-go 1.19
+go 1.25
 
 require (
 	github.com/apache/arrow/go/v11 v11.0.0
@@ -48,11 +48,4 @@ require (
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
-)
-
-replace (
-	github.com/go-logr/logr => github.com/go-logr/logr v0.3.0
-	github.com/go-logr/zapr => github.com/go-logr/zapr v0.2.0
-	k8s.io/klog/v2 => k8s.io/klog/v2 v2.2.0
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.7.2
 )

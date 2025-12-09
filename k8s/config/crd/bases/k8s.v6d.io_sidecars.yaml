@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.8.0
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.16.4
   name: sidecars.k8s.v6d.io
 spec:
   group: k8s.v6d.io
@@ -57,6 +56,7 @@ spec:
                 default: 0
                 type: integer
               securityContext:
+                default: {}
                 properties:
                   allowPrivilegeEscalation:
                     type: boolean
@@ -111,6 +111,8 @@ spec:
                         type: string
                       gmsaCredentialSpecName:
                         type: string
+                      hostProcess:
+                        type: boolean
                       runAsUserName:
                         type: string
                     type: object
@@ -142,6 +144,7 @@ spec:
                   cpu:
                     type: string
                   env:
+                    default: []
                     items:
                       properties:
                         name:
@@ -161,6 +164,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                             fieldRef:
                               properties:
                                 apiVersion:
@@ -170,6 +174,7 @@ spec:
                               required:
                               - fieldPath
                               type: object
+                              x-kubernetes-map-type: atomic
                             resourceFieldRef:
                               properties:
                                 containerName:
@@ -185,6 +190,7 @@ spec:
                               required:
                               - resource
                               type: object
+                              x-kubernetes-map-type: atomic
                             secretKeyRef:
                               properties:
                                 key:
@@ -196,6 +202,7 @@ spec:
                               required:
                               - key
                               type: object
+                              x-kubernetes-map-type: atomic
                           type: object
                       required:
                       - name
@@ -219,6 +226,7 @@ spec:
                     default: /var/run/vineyard-kubernetes/{{.Namespace}}/{{.Name}}
                     type: string
                   spill:
+                    default: {}
                     properties:
                       name:
                         default: ""
@@ -227,6 +235,7 @@ spec:
                         default: ""
                         type: string
                       persistentVolumeClaimSpec:
+                        default: {}
                         properties:
                           accessModes:
                             items:
@@ -239,6 +248,21 @@ spec:
                               kind:
                                 type: string
                               name:
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                            x-kubernetes-map-type: atomic
+                          dataSourceRef:
+                            properties:
+                              apiGroup:
+                                type: string
+                              kind:
+                                type: string
+                              name:
+                                type: string
+                              namespace:
                                 type: string
                             required:
                             - kind
@@ -286,7 +310,10 @@ spec:
                                   type: string
                                 type: object
                             type: object
+                            x-kubernetes-map-type: atomic
                           storageClassName:
+                            type: string
+                          volumeAttributesClassName:
                             type: string
                           volumeMode:
                             type: string
@@ -294,6 +321,7 @@ spec:
                             type: string
                         type: object
                       persistentVolumeSpec:
+                        default: {}
                         properties:
                           accessModes:
                             items:
@@ -372,6 +400,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               user:
                                 type: string
                             required:
@@ -390,6 +419,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               volumeID:
                                 type: string
                             required:
@@ -412,6 +442,7 @@ spec:
                               uid:
                                 type: string
                             type: object
+                            x-kubernetes-map-type: granular
                           csi:
                             properties:
                               controllerExpandSecretRef:
@@ -421,6 +452,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               controllerPublishSecretRef:
                                 properties:
                                   name:
@@ -428,10 +460,19 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               driver:
                                 type: string
                               fsType:
                                 type: string
+                              nodeExpandSecretRef:
+                                properties:
+                                  name:
+                                    type: string
+                                  namespace:
+                                    type: string
+                                type: object
+                                x-kubernetes-map-type: atomic
                               nodePublishSecretRef:
                                 properties:
                                   name:
@@ -439,6 +480,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               nodeStageSecretRef:
                                 properties:
                                   name:
@@ -446,6 +488,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               readOnly:
                                 type: boolean
                               volumeAttributes:
@@ -495,6 +538,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                             required:
                             - driver
                             type: object
@@ -572,6 +616,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               targetPortal:
                                 type: string
                             required:
@@ -644,10 +689,12 @@ spec:
                                             type: object
                                           type: array
                                       type: object
+                                      x-kubernetes-map-type: atomic
                                     type: array
                                 required:
                                 - nodeSelectorTerms
                                 type: object
+                                x-kubernetes-map-type: atomic
                             type: object
                           persistentVolumeReclaimPolicy:
                             type: string
@@ -712,6 +759,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               user:
                                 type: string
                             required:
@@ -735,6 +783,7 @@ spec:
                                   namespace:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               sslEnabled:
                                 type: boolean
                               storageMode:
@@ -775,11 +824,14 @@ spec:
                                   uid:
                                     type: string
                                 type: object
+                                x-kubernetes-map-type: atomic
                               volumeName:
                                 type: string
                               volumeNamespace:
                                 type: string
                             type: object
+                          volumeAttributesClassName:
+                            type: string
                           volumeMode:
                             type: string
                           vsphereVolume:
@@ -812,6 +864,7 @@ spec:
                     type: boolean
                 type: object
               volume:
+                default: {}
                 properties:
                   mountPath:
                     default: ""
@@ -821,6 +874,7 @@ spec:
                     type: string
                 type: object
               volumeMounts:
+                default: []
                 items:
                   properties:
                     mountPath:
@@ -841,6 +895,7 @@ spec:
                   type: object
                 type: array
               volumes:
+                default: []
                 items:
                   properties:
                     awsElasticBlockStore:
@@ -904,6 +959,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         user:
                           type: string
                       required:
@@ -920,6 +976,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         volumeID:
                           type: string
                       required:
@@ -950,6 +1007,7 @@ spec:
                         optional:
                           type: boolean
                       type: object
+                      x-kubernetes-map-type: atomic
                     csi:
                       properties:
                         driver:
@@ -961,6 +1019,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         readOnly:
                           type: boolean
                         volumeAttributes:
@@ -987,6 +1046,7 @@ spec:
                                 required:
                                 - fieldPath
                                 type: object
+                                x-kubernetes-map-type: atomic
                               mode:
                                 format: int32
                                 type: integer
@@ -1007,6 +1067,7 @@ spec:
                                 required:
                                 - resource
                                 type: object
+                                x-kubernetes-map-type: atomic
                             required:
                             - path
                             type: object
@@ -1025,8 +1086,6 @@ spec:
                       type: object
                     ephemeral:
                       properties:
-                        readOnly:
-                          type: boolean
                         volumeClaimTemplate:
                           properties:
                             metadata:
@@ -1044,6 +1103,21 @@ spec:
                                     kind:
                                       type: string
                                     name:
+                                      type: string
+                                  required:
+                                  - kind
+                                  - name
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                dataSourceRef:
+                                  properties:
+                                    apiGroup:
+                                      type: string
+                                    kind:
+                                      type: string
+                                    name:
+                                      type: string
+                                    namespace:
                                       type: string
                                   required:
                                   - kind
@@ -1091,7 +1165,10 @@ spec:
                                         type: string
                                       type: object
                                   type: object
+                                  x-kubernetes-map-type: atomic
                                 storageClassName:
+                                  type: string
+                                volumeAttributesClassName:
                                   type: string
                                 volumeMode:
                                   type: string
@@ -1137,6 +1214,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                       required:
                       - driver
                       type: object
@@ -1221,6 +1299,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         targetPortal:
                           type: string
                       required:
@@ -1279,6 +1358,43 @@ spec:
                         sources:
                           items:
                             properties:
+                              clusterTrustBundle:
+                                properties:
+                                  labelSelector:
+                                    properties:
+                                      matchExpressions:
+                                        items:
+                                          properties:
+                                            key:
+                                              type: string
+                                            operator:
+                                              type: string
+                                            values:
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                          - key
+                                          - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        type: object
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  name:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                                  path:
+                                    type: string
+                                  signerName:
+                                    type: string
+                                required:
+                                - path
+                                type: object
                               configMap:
                                 properties:
                                   items:
@@ -1301,6 +1417,7 @@ spec:
                                   optional:
                                     type: boolean
                                 type: object
+                                x-kubernetes-map-type: atomic
                               downwardAPI:
                                 properties:
                                   items:
@@ -1315,6 +1432,7 @@ spec:
                                           required:
                                           - fieldPath
                                           type: object
+                                          x-kubernetes-map-type: atomic
                                         mode:
                                           format: int32
                                           type: integer
@@ -1335,6 +1453,7 @@ spec:
                                           required:
                                           - resource
                                           type: object
+                                          x-kubernetes-map-type: atomic
                                       required:
                                       - path
                                       type: object
@@ -1362,6 +1481,7 @@ spec:
                                   optional:
                                     type: boolean
                                 type: object
+                                x-kubernetes-map-type: atomic
                               serviceAccountToken:
                                 properties:
                                   audience:
@@ -1376,8 +1496,6 @@ spec:
                                 type: object
                             type: object
                           type: array
-                      required:
-                      - sources
                       type: object
                     quobyte:
                       properties:
@@ -1418,6 +1536,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         user:
                           type: string
                       required:
@@ -1439,6 +1558,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         sslEnabled:
                           type: boolean
                         storageMode:
@@ -1490,6 +1610,7 @@ spec:
                             name:
                               type: string
                           type: object
+                          x-kubernetes-map-type: atomic
                         volumeName:
                           type: string
                         volumeNamespace:
@@ -1524,9 +1645,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

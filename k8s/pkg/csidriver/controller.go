@@ -84,7 +84,7 @@ func (vc *VineyardCSI) CreateVolume(ctx context.Context, req *csi.CreateVolumeRe
 		return nil, status.Error(codes.InvalidArgument, "CreateVolume Name must be provided")
 	}
 
-	if req.VolumeCapabilities == nil || len(req.VolumeCapabilities) == 0 {
+	if len(req.VolumeCapabilities) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "CreateVolume Volume capabilities must be provided")
 	}
 	vc.mutex.Lock()

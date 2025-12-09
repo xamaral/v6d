@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"github.com/v6d-io/v6d/k8s/pkg/log"
 )
@@ -54,26 +55,26 @@ func (r *Operation) Default() {
 var _ webhook.Validator = &Operation{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Operation) ValidateCreate() error {
+func (r *Operation) ValidateCreate() (admission.Warnings, error) {
 	olog.Info("validate create", "name", r.Name)
 	r.check()
 
-	return nil
+	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Operation) ValidateUpdate(old runtime.Object) error {
+func (r *Operation) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
 	olog.Info("validate update", "name", r.Name)
 	r.check()
 
-	return nil
+	return nil, nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Operation) ValidateDelete() error {
+func (r *Operation) ValidateDelete() (admission.Warnings, error) {
 	olog.Info("validate delete", "name", r.Name)
 
-	return nil
+	return nil, nil
 }
 
 func (r *Operation) check() {

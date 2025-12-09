@@ -2,7 +2,7 @@
 set -o errexit
 
 kind_name=kind
-k8s_version=v1.19.3
+k8s_version=v1.29.0
 kubeconfig_path=/tmp/e2e-k8s.config
 
 if [ ! -z "$1" ] ; then
@@ -25,15 +25,26 @@ containerdConfigPatches:
 - |-
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
     endpoint = ["http://${reg_name}:5000"]
+kubeadmConfigPatches:
+- |
+  kind: InitConfiguration
+  nodeRegistration:
+    kubeletExtraArgs:
+      cgroup-driver: systemd
+- |
+  kind: JoinConfiguration
+  nodeRegistration:
+    kubeletExtraArgs:
+      cgroup-driver: systemd
 nodes:
 - role: control-plane
-  image: kindest/node:v1.19.3
+  image: kindest/node:v1.29.0
 - role: worker
-  image: kindest/node:v1.19.3
+  image: kindest/node:v1.29.0
 - role: worker
-  image: kindest/node:v1.19.3
+  image: kindest/node:v1.29.0
 - role: worker
-  image: kindest/node:v1.19.3
+  image: kindest/node:v1.29.0
 EOF
 
 # connect the registry to the cluster network if not already connected
@@ -55,3 +66,9 @@ data:
     host: "localhost:${reg_port}"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
+
+# preload vineyardd image to local registry
+echo "Preloading vineyardd image..."
+docker pull vineyardcloudnative/vineyardd:latest
+docker tag vineyardcloudnative/vineyardd:latest localhost:${reg_port}/vineyardd:latest
+docker push localhost:${reg_port}/vineyardd:latest

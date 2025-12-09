@@ -151,12 +151,10 @@ type VineyardConfig struct {
 
 	// the memory resources of vineyard container
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:={}
 	Memory string `json:"memory,omitempty"`
 
 	// the cpu resources of vineyard container
 	// +kubebuilder:validation:Optional
-	// +kubebuilder:default:={}
 	CPU string `json:"cpu,omitempty"`
 }
 
